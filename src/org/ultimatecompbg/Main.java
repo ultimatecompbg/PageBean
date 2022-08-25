@@ -1,11 +1,6 @@
 package org.ultimatecompbg;
 
-import com.sun.security.jgss.GSSUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-
 import static java.lang.Integer.parseInt;
 
 public class Main {
@@ -14,20 +9,22 @@ public class Main {
     public static void main(String[] args){
 
 
+        Page newPage = Page.getInstance();
+
+        // elements parameters
         Scanner numberScanner = new Scanner(System.in);
         int elementNumber = parseInt(numberScanner.nextLine());
+        newPage.setTotal(elementNumber);
         Scanner sizeScanner = new Scanner(System.in);
-        int pageSize = parseInt(numberScanner.nextLine());
-        ArrayList<String> elements = new ArrayList<String>();
+        int pageSize = parseInt(sizeScanner.nextLine());
+        newPage.setSize(pageSize);
+
         for(int i = 0; i < elementNumber; i++){
             Scanner elementScanner = new Scanner(System.in);
             String element = elementScanner.nextLine();
-            elements.add(element);
+            newPage.addElement(element);
         }
-        int pageNumber = (int) Math.ceil(elements.size() / pageSize);
-        for(int i = 0; i < pageNumber; i++){
 
-        }
 
         /*while(true){
 f
@@ -39,35 +36,28 @@ f
             }
             pageBean.pages.add(newPage);
         }*/
-        next();
-        Scanner scanCommands = new Scanner(System.in);
+        next(newPage);
         while(true){
-            scanCommands = new Scanner(System.in);
+            Scanner scanCommands = new Scanner(System.in);
             String input = scanCommands.nextLine();
-            if(input == "end"){
+            if(input.equals("end")){
                 break;
             }
             switch(input){
                 case "next":
-                    next();
+                    next(newPage);
                     break;
                 case "previous":
-                    previous();
+                    previous(newPage);
                     break;
                 case "first page":
-                    firstPage();
+                    firstPage(newPage);
                     break;
                 case "last page":
-                    lastPage();
+                    lastPage(newPage);
                     break;
                 case "current page":
-                    getCurrentPageNumber();
-                    break;
-                case "has next":
-                    hasNext();
-                    break;
-                case "has previous":
-                    hasPrevious();
+                    getCurrentPageNumber(newPage);
                     break;
 
             }
@@ -75,50 +65,45 @@ f
 
 
     }
-    public static void printPage(){
-        for(int i = currentElement; i < currentElement + 5; i++){
-            System.out.println(currentElement);
+    public static void next(Page newPage){
+
+        if(hasNext(newPage)){
+            for(int i = newPage.getCurrent(); i < newPage.getCurrent() + newPage.getSize() && i < newPage.getTotal(); i++){
+                System.out.println(newPage.getElement(i));
+            }
+            newPage.setCurrent(newPage.getCurrent() + newPage.getSize());
         }
+
     }
-    public static void next() {
+    public static void previous(Page newPage) {
 
-        ;
-        printPage();
-    }
-
-    public static void previous() {
-
-        pageBean.currentPage--;
-        printPage();
-    }
-    public static void firstPage() {
-
-        pageBean.currentPage = 0;
-        printPage();
-    }
-    public static void lastPage() {
-
-        pageBean.currentPage = pageBean.pages.size() - 1;
-        printPage();
-    }
-    public static void getCurrentPageNumber() {
-
-        System.out.printf("Current page: %s%n", pageBean.currentPage);
-    }
-    public static void hasNext() {
-
-        if(pageBean.currentPage == pageBean.pages.size() - 1){
-            System.out.println("## There are no elements next ##");
+        if(hasPrevious(newPage)){
+            newPage.setCurrent(newPage.getCurrent() - (newPage.getSize() * 2));
+            next(newPage);
         }else{
-            System.out.println("## There are elements next ##");
+            System.out.println("There are no previous pages!");
         }
-    }
-    public static void hasPrevious(Page pageBean) {
 
-        if(pageBean.currentPage == 0){
-            System.out.println("## There are no previous elements ##");
-        }else{
-            System.out.println("## There are previous elements ##");
-        }
+    }
+    public static void firstPage(Page newPage) {
+        newPage.setCurrent(0);
+        next(newPage);
+    }
+    public static void lastPage(Page newPage) {
+
+        newPage.setCurrent(newPage.getCurrent() - newPage.getSize());
+        next(newPage);
+    }
+    public static void getCurrentPageNumber(Page newPage) {
+
+        System.out.printf("Current page: %s%n", Math.floor(newPage.getCurrent() / newPage.getSize()));
+    }
+    public static boolean hasNext(Page newPage) {
+
+        return newPage.getCurrent() < newPage.getTotal();
+    }
+    public static boolean hasPrevious(Page newPage) {
+
+        return newPage.getCurrent() != newPage.getSize();
     }
 }
